@@ -16,6 +16,22 @@ export default {
 		return new Response('Hello World!');
 	},
 	async email(message: ForwardableEmailMessage, env: Env, ctx: ExecutionContext): Promise<void> {
-		message.setReject('Testing');
+		let to_name = message.to.split('@')[0];
+		switch (to_name) {
+			case 'reject':
+				return handle_reject(message, env, ctx);
+			case 'exception':
+				return handle_exception(message, env, ctx);
+			default:
+				return;
+		}
 	},
 } satisfies ExportedHandler<Env>;
+
+const handle_reject: EmailExportedHandler<Env> = (message, env, ctx) => {
+	return message.setReject('reject everything');
+};
+
+const handle_exception: EmailExportedHandler<Env> = (message, env, ctx) => {
+	throw 'ERROR';
+};
