@@ -15,4 +15,7 @@ export default {
 	async fetch(request, env, ctx): Promise<Response> {
 		return new Response('Hello World!');
 	},
+	async email(message: ForwardableEmailMessage, env: Env, ctx: ExecutionContext): Promise<void> {
+		message.setReject('Testing');
+	},
 } satisfies ExportedHandler<Env>;
