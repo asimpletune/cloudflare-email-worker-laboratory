@@ -13,7 +13,7 @@
 
 import { EmailMessage } from 'cloudflare:email';
 import PostalMime from 'postal-mime';
-import { foldLines, getFoldedHeaderValue, headerValue } from './util';
+import { foldHeader } from './util';
 import { createMimeMessage } from 'mimetext';
 
 type EmailError =
@@ -125,7 +125,9 @@ const handle_parse: EmailExportedHandler<Env> = async (message, env, ctx) => {
 // TOOD: for some reason no reply body is being included in the actual reply I receive and I have no idea why
 const handle_outlook_reply: EmailExportedHandler<Env> = async (message, env, ctx) => {
 	let parsed_msg = await PostalMime.parse(message.raw, { rfc822Attachments: false });
-	let in_reply_to_value = getFoldedHeaderValue('In-Reply-To', foldLines(`In-Reply-To: ${parsed_msg.messageId}`, 76, false, false));
+	// THIS WORKS: `let in_reply_to_value = message.headers.get('Message-ID')!`
+	// THIS DOES NOT WORK (but should)
+	let in_reply_to_value = foldHeader('In-Reply-To', message.headers.get('Message-ID')!).value
 	console.log(in_reply_to_value);
 	console.log(parsed_msg.subject);
 	let reply = createMimeMessage();
